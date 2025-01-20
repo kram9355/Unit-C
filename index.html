@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Unit Converter Tool with a modern and sleek interface">
+    <meta name="keywords" content="Unit Converter, Measurement Tool, Length, Weight, Volume, Temperature, Time, Speed, Area, Energy">
+    <meta name="author" content="Your Name">
+    <title>Unit Converter</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1c1c1c;
+            color: #ffffff;
+        }
+        header {
+            background-color: #b71c1c;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 1.5rem;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #2c2c2c;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #f5f5f5;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input, select {
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin-top: 8px;
+            border: none;
+            border-radius: 5px;
+            background: #424242;
+            color: white;
+            font-size: 1rem;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border: 2px solid #b71c1c;
+        }
+        button {
+            background-color: #b71c1c;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #d32f2f;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #424242;
+            border-left: 4px solid #b71c1c;
+            border-radius: 5px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        Unit Converter
+    </header>
+    <div class="container">
+        <h1>Convert Units</h1>
+        <form id="converterForm">
+            <label for="category">Select Category:</label>
+            <select id="category" onchange="updateUnits()">
+                <option value="length">Length</option>
+                <option value="weight">Weight</option>
+                <option value="volume">Volume</option>
+                <option value="temperature">Temperature</option>
+                <option value="energy">Energy</option>
+                <option value="time">Time</option>
+                <option value="speed">Speed</option>
+                <option value="area">Area</option>
+            </select>
+
+            <label for="fromUnit">From Unit:</label>
+            <select id="fromUnit"></select>
+
+            <label for="toUnit">To Unit:</label>
+            <select id="toUnit"></select>
+
+            <label for="value">Enter Value:</label>
+            <input type="number" id="value" placeholder="Enter a value">
+
+            <button type="button" onclick="convertUnits()">Convert</button>
+        </form>
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        const units = {
+            length: {
+                "Inches": 0.0254,
+                "Feet": 0.3048,
+                "Yards": 0.9144,
+                "Miles": 1609.34,
+                "Millimeters": 0.001,
+                "Centimeters": 0.01,
+                "Meters": 1,
+                "Kilometers": 1000,
+                "Nautical Miles": 1852
+            },
+            weight: {
+                "Grams": 0.001,
+                "Kilograms": 1,
+                "Ounces": 0.0283495,
+                "Pounds": 0.453592,
+                "Tons": 907.18474
+            },
+            volume: {
+                "Milliliters": 0.001,
+                "Liters": 1,
+                "Teaspoons": 0.00492892,
+                "Tablespoons": 0.0147868,
+                "Cups": 0.24,
+                "Pints": 0.473176,
+                "Quarts": 0.946353,
+                "Gallons": 3.78541,
+                "Cubic Meters": 1000
+            },
+            temperature: {},
+            energy: {
+                "Calories": 4.184,
+                "Joules": 1,
+                "Kilowatt-hours": 3600000
+            },
+            time: {
+                "Seconds": 1,
+                "Minutes": 60,
+                "Hours": 3600,
+                "Days": 86400,
+                "Weeks": 604800,
+                "Years": 31557600
+            },
+            speed: {
+                "Kilometers per hour": 0.277778,
+                "Miles per hour": 0.44704,
+                "Meters per second": 1
+            },
+            area: {
+                "Square Inches": 0.00064516,
+                "Square Feet": 0.092903,
+                "Square Meters": 1,
+                "Acres": 4046.86
+            }
+        };
+
+        function updateUnits() {
+            const category = document.getElementById("category").value;
+            const fromUnit = document.getElementById("fromUnit");
+            const toUnit = document.getElementById("toUnit");
+
+            fromUnit.innerHTML = "";
+            toUnit.innerHTML = "";
+
+            for (let unit in units[category]) {
+                fromUnit.innerHTML += `<option value="${unit}">${unit}</option>`;
+                toUnit.innerHTML += `<option value="${unit}">${unit}</option>`;
+            }
+        }
+
+        function convertUnits() {
+            const category = document.getElementById("category").value;
+            const fromUnit = document.getElementById("fromUnit").value;
+            const toUnit = document.getElementById("toUnit").value;
+            const value = parseFloat(document.getElementById("value").value);
+
+            if (isNaN(value)) {
+                alert("Please enter a valid number.");
+                return;
+            }
+
+            let result;
+
+            if (category === "temperature") {
+                if (fromUnit === "Celsius" && toUnit === "Fahrenheit") {
+                    result = (value * 9/5) + 32;
+                } else if (fromUnit === "Fahrenheit" && toUnit === "Celsius") {
+                    result = (value - 32) * 5/9;
+                } else if (fromUnit === "Celsius" && toUnit === "Kelvin") {
+                    result = value + 273.15;
+                } else if (fromUnit === "Kelvin" && toUnit === "Celsius") {
+                    result = value - 273.15;
+                } else if (fromUnit === "Fahrenheit" && toUnit === "Kelvin") {
+                    result = (value - 32) * 5/9 + 273.15;
+                } else if (fromUnit === "Kelvin" && toUnit === "Fahrenheit") {
+                    result = (value - 273.15) * 9/5 + 32;
+                } else {
+                    result = value;
+                }
+            } else {
+                const fromRate = units[category][fromUnit];
+                const toRate = units[category][toUnit];
+                result = (value * fromRate) / toRate;
+            }
+
+            document.getElementById("result").style.display = "block";
+            document.getElementById("result").innerHTML = `Converted Value: <strong>${result.toFixed(2)}</strong>`;
+        }
+
+        // Initialize the units on page load
+        updateUnits();
+    </script>
+</body>
+</html>
